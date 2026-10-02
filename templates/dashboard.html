@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PCA ML Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>PCA ML</h2>
+            <p>Machine Learning Dashboard</p>
+        </div>
+
+        <nav>
+            <a href="#dashboard" class="active">📊 Dashboard</a>
+            <a href="#pca">📈 PCA Analysis</a>
+            <a href="#prediction">🌸 Prediction</a>
+            <a href="#evaluation">🎯 Evaluation</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Iris Dataset</p>
+            <span>Flask + PCA + Logistic Regression</span>
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content" id="dashboard">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+                <h1>PCA-Based Dimensionality Reduction</h1>
+
+                <p>
+                    Iris Classification using PCA and Logistic Regression
+                </p>
+            </div>
+
+            <div class="status">
+                <span class="status-dot"></span>
+                Model Active
+            </div>
+
+        </header>
+
+
+        <!-- ================= METRICS ================= -->
+
+        <section class="metrics">
+
+            <div class="metric-card">
+
+                <div class="metric-icon">
+                    📊
+                </div>
+
+                <div>
+                    <p>Original Features</p>
+                    <h2>4</h2>
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-icon">
+                    🔽
+                </div>
+
+                <div>
+                    <p>Principal Components</p>
+                    <h2>2</h2>
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-icon">
+                    📈
+                </div>
+
+                <div>
+                    <p>Variance Retained</p>
+                    <h2>{{ variance }}%</h2>
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-icon">
+                    🎯
+                </div>
+
+                <div>
+                    <p>Test Accuracy</p>
+                    <h2>{{ model_accuracy }}%</h2>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PCA ANALYSIS ================= -->
+
+        <section id="pca" class="section">
+
+            <div class="section-heading">
+
+                <h2>PCA Visualization</h2>
+
+                <p>
+                    Dataset transformed from 4 dimensions
+                    into 2 principal components.
+                </p>
+
+            </div>
+
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <h3>PCA Scatter Plot</h3>
+
+                    <p>
+                        Visualization of Iris samples
+                        in principal component space.
+                    </p>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas id="pcaChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PREDICTION ================= -->
+
+        <section id="prediction"
+                 class="prediction-section">
+
+            <div class="section-heading">
+
+                <h2>🌸 Iris Flower Prediction</h2>
+
+                <p>
+                    Enter flower measurements to predict
+                    the Iris species.
+                </p>
+
+            </div>
+
+
+            <div class="prediction-layout">
+
+
+                <!-- INPUT FORM -->
+
+                <div class="form-card">
+
+                    <h3>Enter Features</h3>
+
+                    <form method="POST">
+
+                        <div class="input-grid">
+
+
+                            <div class="input-group">
+
+                                <label>
+                                    Sepal Length (cm)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    name="sepal_length"
+                                    placeholder="Example: 5.1"
+                                    required>
+
+                            </div>
+
+
+                            <div class="input-group">
+
+                                <label>
+                                    Sepal Width (cm)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    name="sepal_width"
+                                    placeholder="Example: 3.5"
+                                    required>
+
+                            </div>
+
+
+                            <div class="input-group">
+
+                                <label>
+                                    Petal Length (cm)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    name="petal_length"
+                                    placeholder="Example: 1.4"
+                                    required>
+
+                            </div>
+
+
+                            <div class="input-group">
+
+                                <label>
+                                    Petal Width (cm)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    name="petal_width"
+                                    placeholder="Example: 0.2"
+                                    required>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="predict-btn">
+
+                            Predict Species
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- PREDICTION RESULT -->
+
+                <div class="result-card">
+
+                    <h3>Prediction Result</h3>
+
+
+                    {% if prediction %}
+
+                    <div class="prediction-result">
+
+                        <p>Predicted Species</p>
+
+                        <h2>
+                            🌸 {{ prediction }}
+                        </h2>
+
+                    </div>
+
+
+                    <div class="pc-values">
+
+                        <div>
+
+                            <span>PC1</span>
+
+                            <strong>
+                                {{ pc1 }}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>PC2</span>
+
+                            <strong>
+                                {{ pc2 }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    {% else %}
+
+                    <div class="empty-result">
+
+                        <div>🔍</div>
+
+                        <p>
+                            Enter flower measurements
+                            to generate a prediction.
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= MODEL EVALUATION ================= -->
+
+        <section id="evaluation"
+                 class="section">
+
+            <div class="section-heading">
+
+                <h2>Model Evaluation</h2>
+
+                <p>
+                    Logistic Regression performance
+                    on the test dataset.
+                </p>
+
+            </div>
+
+
+            <div class="evaluation-grid">
+
+
+                <!-- ACCURACY -->
+
+                <div class="evaluation-card">
+
+                    <div class="evaluation-icon">
+                        🎯
+                    </div>
+
+                    <p>
+                        Test Accuracy
+                    </p>
+
+                    <h2>
+                        {{ model_accuracy }}%
+                    </h2>
+
+                    <span>
+                        Logistic Regression
+                    </span>
+
+                </div>
+
+
+                <!-- CONFUSION MATRIX -->
+
+                <div class="chart-card confusion-card">
+
+                    <div class="chart-header">
+
+                        <h3>
+                            Confusion Matrix
+                        </h3>
+
+                        <p>
+                            Actual vs predicted classes
+                        </p>
+
+                    </div>
+
+
+                    <div class="chart-container">
+
+                        <canvas id="confusionChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PCA OVERVIEW ================= -->
+
+        <section class="overview-section">
+
+            <div class="overview-card">
+
+                <h2>
+                    Dimensionality Reduction Overview
+                </h2>
+
+
+                <p>
+
+                    Principal Component Analysis reduces
+                    the original four-dimensional feature
+                    space into two principal components
+                    while retaining important information
+                    from the dataset.
+
+                </p>
+
+
+                <div class="reduction">
+
+
+                    <div class="reduction-box">
+
+                        <span>
+                            Original
+                        </span>
+
+                        <strong>
+                            4
+                        </strong>
+
+                        <small>
+                            Features
+                        </small>
+
+                    </div>
+
+
+                    <div class="arrow">
+                        →
+                    </div>
+
+
+                    <div class="reduction-box">
+
+                        <span>
+                            Reduced
+                        </span>
+
+                        <strong>
+                            2
+                        </strong>
+
+                        <small>
+                            Components
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="variance-bar">
+
+                    <div class="variance-info">
+
+                        <span>
+                            Variance Retained
+                        </span>
+
+                        <strong>
+                            {{ variance }}%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-fill"
+                            style="width: {{ variance }}%;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer>
+
+            <p>
+                PCA-Based Dimensionality Reduction
+                and Classification
+            </p>
+
+            <span>
+                Python • Pandas • Scikit-learn • Flask • PCA
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ================================================= -->
+
+<script>
+
+
+/* ================= PCA DATA ================= */
+
+const pc1Data =
+    {{ pca_data.pc1 | tojson }};
+
+const pc2Data =
+    {{ pca_data.pc2 | tojson }};
+
+const speciesData =
+    {{ pca_data.species | tojson }};
+
+
+const setosa = [];
+const versicolor = [];
+const virginica = [];
+
+
+for (
+    let i = 0;
+    i < speciesData.length;
+    i++
+) {
+
+    const point = {
+
+        x: pc1Data[i],
+
+        y: pc2Data[i]
+
+    };
+
+
+    if (
+        speciesData[i] === "setosa"
+    ) {
+
+        setosa.push(point);
+
+    }
+
+    else if (
+        speciesData[i] === "versicolor"
+    ) {
+
+        versicolor.push(point);
+
+    }
+
+    else if (
+        speciesData[i] === "virginica"
+    ) {
+
+        virginica.push(point);
+
+    }
+
+}
+
+
+/* ================= PCA CHART ================= */
+
+const pcaCanvas =
+    document.getElementById("pcaChart");
+
+
+if (pcaCanvas) {
+
+    new Chart(
+
+        pcaCanvas,
+
+        {
+
+            type: "scatter",
+
+            data: {
+
+                datasets: [
+
+                    {
+                        label: "Setosa",
+                        data: setosa,
+                        pointRadius: 5
+                    },
+
+                    {
+                        label: "Versicolor",
+                        data: versicolor,
+                        pointRadius: 5
+                    },
+
+                    {
+                        label: "Virginica",
+                        data: virginica,
+                        pointRadius: 5
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        position: "top"
+
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return (
+                                    "PC1: "
+                                    + context.parsed.x.toFixed(2)
+                                    + " | PC2: "
+                                    + context.parsed.y.toFixed(2)
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    x: {
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Principal Component 1 (PC1)"
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Principal Component 2 (PC2)"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* ================= CONFUSION MATRIX ================= */
+
+const confusionData =
+    {{ confusion_data | tojson }};
+
+
+const confusionCanvas =
+    document.getElementById("confusionChart");
+
+
+if (confusionCanvas) {
+
+    new Chart(
+
+        confusionCanvas,
+
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: [
+
+                    "Setosa",
+                    "Versicolor",
+                    "Virginica"
+
+                ],
+
+
+                datasets: [
+
+                    {
+
+                        label: "Actual Setosa",
+
+                        data: confusionData[0],
+
+                        borderWidth: 1
+
+                    },
+
+
+                    {
+
+                        label: "Actual Versicolor",
+
+                        data: confusionData[1],
+
+                        borderWidth: 1
+
+                    },
+
+
+                    {
+
+                        label: "Actual Virginica",
+
+                        data: confusionData[2],
+
+                        borderWidth: 1
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    x: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "Predicted Class"
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            stepSize: 1
+
+                        },
+
+                        title: {
+
+                            display: true,
+
+                            text: "Number of Samples"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>
